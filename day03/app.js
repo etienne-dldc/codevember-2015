@@ -91,13 +91,12 @@ $(function () {
         if (ratio === false) {
           ratio = captureFlow.width / captureFlow.height;
         }
-        console.log(ratio);
         capture = captureFlow.get();
         if (setts.mode === 'video') {
           p.image(capture, -setts.size/2, -(setts.size/ratio)/2, setts.size, setts.size/ratio );
         } else
         if (setts.mode === 'recursiveVideo') {
-          createPixModel(20, 20/ratio);
+          createPixModel(20, 20);
           result = generateRecursive(capture, setts.size, setts.size/ratio);
           p.image(result, -result.width/2, -result.height/2);
         }
