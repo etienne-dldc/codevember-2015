@@ -5,29 +5,34 @@ $(function () {
     var winHeight = $(window).height();
     var winWidth = $(window).width();
 
-    var song1, song2, fft, analyzer, gui, setts;
+    var song1, song2, song, fft, analyzer, gui, setts;
     var globalRotate = 0;
+    var songs = {};
     var slow = 0;
     var points = [];
 
     var Settings = function() {
+      this.song = 'hello';
       this.maxPointSize = 30;
+      this.minPointSize = 1;
+      this.maxStrokeSize = 0.5;
+      this.minStrokeSize = 0.1;
+      this.pointStrokeLimit = 0.25;
       this.pointPaddingX = 30;
       this.pointPaddingY = -5;
-      this.initDistance = 4;
+      this.initDistance = 30;
       this.speed = 50;
       this.amplifier = 4;
       this.maxPoints = 200;
       this.rotation = true;
       this.rotationInvert = true;
       this.rotationSpeed = 120;
-      this.pointStrokeLimitMultiplier = 0.15;
       this.playPause = function playPause() {
         if ( song.isPlaying() ) { // .isPlaying() returns a boolean
           song.pause();
           p.noLoop();
         } else {
-          song.play();
+          song.loop();
           p.loop();
         }
       }
@@ -36,41 +41,44 @@ $(function () {
     Settings.prototype.update = function () {
       this.maxPointSizeWithPaddingX = this.maxPointSize + (2*this.pointPaddingX);
       this.maxPointSizeWithPaddingY = this.maxPointSize + (2*this.pointPaddingY);
-      this.pointStrokeLimit = this.maxPointSize * this.pointStrokeLimitMultiplier;
     };
 
     p.preload = function() {
-      song1 = p.loadSound('http://codepen.twik-labs.fr/codevember-2015/day-01/music-01.mp3');
-      song2 = p.loadSound('http://codepen.twik-labs.fr/codevember-2015/day-01/hello.mp3');
+      songs['of-monsters-and-men'] = p.loadSound('http://codepen.twik-labs.fr/codevember-2015/musics/of-monsters-and-men.mp3');
+      songs['hello'] = p.loadSound('http://codepen.twik-labs.fr/codevember-2015/musics/hello.mp3');
+      songs['moustache'] = p.loadSound('http://codepen.twik-labs.fr/codevember-2015/musics/moustache.mp3');
     }
 
     p.setup = function setup() {
-      var song  = song2;
-
       setts = new Settings();
       // dat-gui
       gui = new dat.GUI();
       gui.add(setts, 'playPause');
-      gui.add(setts, 'maxPointSize', 1, 40);
+      var controller = gui.add(setts, 'song', _.map(songs, function (val, key) { return key }));
+      controller.onFinishChange( initSong );
+      gui.add(setts, 'minPointSize', 0.1, 40);
+      gui.add(setts, 'maxPointSize', 0.1, 40);
+      gui.add(setts, 'minStrokeSize', 0.1, 20);
+      gui.add(setts, 'maxStrokeSize', 0.1, 20);
+      gui.add(setts, 'pointStrokeLimit', 0, 1);
       gui.add(setts, 'amplifier', 0.5, 30);
-      gui.add(setts, 'pointPaddingX', -10, 30);
-      gui.add(setts, 'pointPaddingY', -10, 30);
-      gui.add(setts, 'initDistance', 1, 300);
+      gui.add(setts, 'pointPaddingX', -10, 60);
+      gui.add(setts, 'pointPaddingY', -10, 60);
+      gui.add(setts, 'initDistance', 30, 300);
       gui.add(setts, 'maxPoints', 200, 3000);
       gui.add(setts, 'speed', 1, 100);
       gui.add(setts, 'rotationSpeed', 1, 400);
-      gui.add(setts, 'pointStrokeLimitMultiplier', 0.01, 1);
       gui.add(setts, 'rotation');
       gui.add(setts, 'rotationInvert');
       p.createCanvas(winWidth, winHeight);
       p.push();
       p.translate(winWidth/2, winHeight/2);
-      song.play();
       p.background(getFlatColor('wetasphalt'));
+
       fft = new p5.FFT();
-      fft.setInput(song);
       analyzer = new p5.Amplitude();
-      analyzer.setInput(song);
+
+      initSong();
     };
 
     p.draw = function() {
@@ -85,6 +93,16 @@ $(function () {
         setts.update();
         drawSpiral();
       }
+    }
+
+    function initSong() {
+      if (song) {
+        song.stop();
+      }
+      song = songs[setts.song];
+      song.loop();
+      fft.setInput(song);
+      analyzer.setInput(song);
     }
 
     function drawSpiral() {
@@ -115,15 +133,18 @@ $(function () {
     }
 
     function displayPoints(data, x, y) {
-      var size = data.size * setts.amplifier;
       if (data.size > setts.pointStrokeLimit ) {
         p.noFill();
         p.stroke(data.color);
-        p.strokeWeight(p.map(setts.pointStrokeLimit, setts.maxPointSize, 1, setts.maxPointSize/2));
+        var strokeWeight = setts.minStrokeSize + (data.size * (setts.maxStrokeSize - setts.minStrokeSize));
+        strokeWeight = strokeWeight * setts.amplifier;
+        p.strokeWeight(strokeWeight);
       } else {
         p.fill(data.color);
         p.noStroke();
       }
+      var size = p.map(data.size, 0, 1, setts.minPointSize, setts.maxPointSize);
+      size = size * setts.amplifier;
       p.ellipse(x,y, size, size);
     }
 
@@ -152,7 +173,7 @@ $(function () {
       var colors = getFlatColorArray(['turquoise','emerland', 'peterriver', 'amethyst', 'greensea', 'nephritis', 'belizehole', 'wisteria', 'sunflower', 'carrot', 'alizarin', 'clouds', 'concrete', 'orange', 'pumpkin', 'pomegranate', 'silver', 'asbestos']);
       var colorIndex = p.floor(maxFreqGroup % colors.length);
       var color = colors[colorIndex];
-      var size = p.map(amplitude, 0, 1, 0, setts.maxPointSize);
+      var size = amplitude;
       points.push({
         size: size,
         color: color

@@ -95,7 +95,7 @@ $(function () {
         song.pause();
       } else {
         isPlaying = true;
-        song.play();
+        song.loop();
       }
     }
 
