@@ -82,6 +82,10 @@ $(function () {
       captureFlow = p.createCapture(p.VIDEO);
       captureFlow.hide();
 
+      $(p.canvas).click(function() {
+        setts.mode = (setts.mode == 'video') ? 'recursiveVideo' : 'video';
+      });
+
     };
 
     p.draw = function () {

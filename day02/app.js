@@ -31,13 +31,17 @@ $(function () {
     var pixGrid = [];
     var mX = 0;
     var mY = 0;
+    var lastTtl;
 
     var Settings = function() {
       this.followMouse = true;
-      this.probaLeft = 0.5;
-      this.probaRight = 0.5;
-      this.probaTop = 0.5;
-      this.probaBottom = 0.5;
+      this.clear = clear;
+      this.stop = stop;
+      this.probaLeft = 0.53;
+      this.probaRight = 0.53;
+      this.probaTop = 0.53;
+      this.probaBottom = 0.53;
+      this.maxTimeToLive = 3000;
     };
     Settings.prototype.update = function () {
     };
@@ -49,13 +53,14 @@ $(function () {
       setts = new Settings();
       gui = new dat.GUI();
       gui.add(setts, 'followMouse');
+      gui.add(setts, 'clear');
+      gui.add(setts, 'stop');
+      gui.add(setts, 'maxTimeToLive', 0, 10000);
       var f1 = gui.addFolder('No follow mode');
       f1.add(setts, 'probaLeft', 0, 1);
       f1.add(setts, 'probaRight', 0, 1);
       f1.add(setts, 'probaTop', 0, 1);
       f1.add(setts, 'probaBottom', 0, 1);
-
-      console.log();
 
       p.background(getFlatColor('wetasphalt'));
 
@@ -65,8 +70,7 @@ $(function () {
 
       // click
       $(p.canvas).click(function(event) {
-        var color = getFlatColor('clouds');
-        drawPiwel(p.mouseX, p.mouseY, color);
+        drawPiwel(p.mouseX, p.mouseY, 0);
       });
 
       p.noLoop();
@@ -77,13 +81,33 @@ $(function () {
       mY = p.mouseY;
     }
 
-    function drawPiwel(x, y) {
+    function clear() {
+      p.background(getFlatColor('wetasphalt'));
+      for (var i = 0; i < p.width; i++) {
+        pixGrid[i] = [];
+      }
+    }
+
+    function stop() {
+      lastTtl = setts.maxTimeToLive;
+      setts.maxTimeToLive = 0;
+      window.setTimeout(function () {
+         setts.maxTimeToLive = lastTtl;
+      }, 100);
+    }
+
+    function drawPiwel(x, y, ttl) {
       if (x < p.width && x > 0 && y < p.height && y > 0) {
         if (pixGrid[x][y] !== 1) {
           p.noStroke();
           p.fill(getFlatColor('clouds'));
           pixGrid[x][y] = 1;
           p.rect(x, y, 1, 1);
+          ttl = ttl + 1;
+
+          if (ttl > setts.maxTimeToLive) {
+            return;
+          }
 
           (function(x, y) {
             window.setTimeout(function () {
@@ -91,22 +115,39 @@ $(function () {
               if (setts.followMouse) {
                 var leftForce = (mX - x) / (p.width); // -1 -> 1
                 var topForce = (mY - y) / (p.height); // -1 -> 1
-                leftForce = p.map(leftForce, -1, 1, 0, 1);
-                topForce = p.map(topForce, -1, 1, 0, 1);
+                leftForce = p.map(leftForce, -1, 1, 1, 0);
+                topForce = p.map(topForce, -1, 1, 1, 0);
                 var leftProb = leftForce;
                 var rightProb = 1 - leftForce;
                 var topProb = topForce;
                 var bottomProb = 1 - topForce;
               } else {
-                var leftProb = 1 - setts.probaLeft;
-                var rightProb = 1 - setts.probaRight;
-                var topProb = 1 - setts.probaTop;
-                var bottomProb = 1 - setts.probaBottom;
+                var leftProb = setts.probaLeft;
+                var rightProb = setts.probaRight;
+                var topProb = setts.probaTop;
+                var bottomProb = setts.probaBottom;
               }
-              if (p.random() > leftProb ) { drawPiwel(x-1, y) } // Left
-              if (p.random() > rightProb ) { drawPiwel(x+1, y) } // Right
-              if (p.random() > topProb ) { drawPiwel(x, y-1) } // Top
-              if (p.random() > bottomProb ) { drawPiwel(x, y+1) } // Bottom
+
+              if (ttl < 20) {
+                var ttlAdd = p.map(ttl/20, 0, 1, 0.2, 0 );
+                leftProb = leftProb + ttlAdd;
+                rightProb =  rightProb + ttlAdd;
+                topProb =  topProb + ttlAdd;
+                bottomProb =  bottomProb + ttlAdd;
+              }
+              if (ttl/setts.maxTimeToLive > 0.5) {
+                var ttlMultiplier = p.map(ttl/setts.maxTimeToLive, 0.5, 1, 1, 0 );
+                leftProb = leftProb * ttlMultiplier;
+                rightProb =  rightProb * ttlMultiplier;
+                topProb =  topProb * ttlMultiplier;
+                bottomProb =  bottomProb * ttlMultiplier;
+              }
+
+
+              if ( leftProb > p.random() ) { drawPiwel(x-1, y, ttl) } // Left
+              if ( rightProb > p.random() ) { drawPiwel(x+1, y, ttl) } // Right
+              if ( topProb > p.random() ) { drawPiwel(x, y-1, ttl) } // Top
+              if ( bottomProb > p.random() ) { drawPiwel(x, y+1, ttl) } // Bottom
             }, 0);
           })(x, y);
         }

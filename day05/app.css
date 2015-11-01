@@ -5,19 +5,3 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,c
 html, body{
   overflow: hidden;
 }
-
-.instructions{
-  position: relative;
-  height: 0;
-}
-
-.instructions p{
-  position: absolute;
-  top: 3em;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 2em;
-  color: #ecf0f1;
-  font-family: 'Open Sans' Tahoma sans-serif;
-}
