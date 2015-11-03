@@ -5,7 +5,7 @@ $(function () {
     var winHeight = $(window).height();
     var winWidth = $(window).width();
 
-    var song1, song2, song, fft, analyzer, gui, setts;
+    var song, fft, analyzer, gui, setts;
     var globalRotate = 0;
     var songs = {};
     var slow = 0;
@@ -27,15 +27,8 @@ $(function () {
       this.rotation = true;
       this.rotationInvert = true;
       this.rotationSpeed = 120;
-      this.playPause = function playPause() {
-        if ( song.isPlaying() ) { // .isPlaying() returns a boolean
-          song.pause();
-          p.noLoop();
-        } else {
-          song.loop();
-          p.loop();
-        }
-      }
+      this.clear = clearList;
+      this.playPause = playPause;
       this.update();
     };
     Settings.prototype.update = function () {
@@ -56,6 +49,7 @@ $(function () {
       gui.add(setts, 'playPause');
       var controller = gui.add(setts, 'song', _.map(songs, function (val, key) { return key }));
       controller.onFinishChange( initSong );
+      gui.add(setts, 'clear');
       gui.add(setts, 'minPointSize', 0.1, 40);
       gui.add(setts, 'maxPointSize', 0.1, 40);
       gui.add(setts, 'minStrokeSize', 0.1, 20);
@@ -79,6 +73,8 @@ $(function () {
       analyzer = new p5.Amplitude();
 
       initSong();
+
+      clearList();
     };
 
     p.draw = function() {
@@ -103,6 +99,28 @@ $(function () {
       song.loop();
       fft.setInput(song);
       analyzer.setInput(song);
+
+      clearList();
+    }
+
+    function playPause() {
+      if ( song.isPlaying() ) {
+        song.pause();
+        p.noLoop();
+      } else {
+        song.loop();
+        p.loop();
+      }
+    }
+
+    function clearList() {
+      points = [];
+      for (var i = 0; i < setts.maxPoints; i++) {
+        points.push({
+          size: 0,
+          color: 'rgba(0, 0, 0, 0)'
+        });
+      }
     }
 
     function drawSpiral() {
@@ -133,6 +151,9 @@ $(function () {
     }
 
     function displayPoints(data, x, y) {
+      if (data === null) {
+        return;
+      }
       if (data.size > setts.pointStrokeLimit ) {
         p.noFill();
         p.stroke(data.color);
