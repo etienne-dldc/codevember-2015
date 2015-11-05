@@ -6,21 +6,34 @@ $(function () {
     var winWidth = $(window).width();
 
     var song, fft, analyzer, gui, setts;
+    var globalRotate = 0;
     var songs = {};
+    var slow = 0;
     var points = [];
 
     var Settings = function() {
       this.song = 'hello';
+      this.maxPointSize = 30;
+      this.minPointSize = 1;
+      this.maxStrokeSize = 0.5;
+      this.minStrokeSize = 0.1;
+      this.pointStrokeLimit = 0.25;
+      this.pointPaddingX = 30;
+      this.pointPaddingY = -5;
+      this.initDistance = 30;
+      this.speed = 50;
+      this.amplifier = 4;
+      this.maxPoints = 200;
+      this.rotation = true;
+      this.rotationInvert = true;
+      this.rotationSpeed = 120;
+      this.clear = clearList;
       this.playPause = playPause;
-      this.nbrOfPoints = 100;
-      this.sliceStart = 0;
-      this.sliceEnd = 1000;
-      this.decreaseSpeed = 0.96;
-      this.amplifier = 1.5;
       this.update();
     };
     Settings.prototype.update = function () {
-      this.sliceSize = this.sliceEnd - this.sliceStart;
+      this.maxPointSizeWithPaddingX = this.maxPointSize + (2*this.pointPaddingX);
+      this.maxPointSizeWithPaddingY = this.maxPointSize + (2*this.pointPaddingY);
     };
 
     p.preload = function() {
@@ -36,63 +49,45 @@ $(function () {
       gui.add(setts, 'playPause');
       var controller = gui.add(setts, 'song', _.map(songs, function (val, key) { return key }));
       controller.onFinishChange( initSong );
-      gui.add(setts, 'decreaseSpeed', 0.7, 0.99);
-      gui.add(setts, 'amplifier', 0.5, 4);
-      gui.add(setts, 'sliceStart', 0, 1000);
-      gui.add(setts, 'sliceEnd', 0, 1000);
-      gui.add(setts, 'nbrOfPoints', 5, 500);
+      gui.add(setts, 'clear');
+      gui.add(setts, 'minPointSize', 0.1, 40);
+      gui.add(setts, 'maxPointSize', 0.1, 40);
+      gui.add(setts, 'minStrokeSize', 0.1, 20);
+      gui.add(setts, 'maxStrokeSize', 0.1, 20);
+      gui.add(setts, 'pointStrokeLimit', 0, 1);
+      gui.add(setts, 'amplifier', 0.5, 30);
+      gui.add(setts, 'pointPaddingX', -10, 60);
+      gui.add(setts, 'pointPaddingY', -10, 60);
+      gui.add(setts, 'initDistance', 30, 300);
+      gui.add(setts, 'maxPoints', 200, 3000);
+      gui.add(setts, 'speed', 1, 100);
+      gui.add(setts, 'rotationSpeed', 1, 400);
+      gui.add(setts, 'rotation');
+      gui.add(setts, 'rotationInvert');
       p.createCanvas(winWidth, winHeight);
       p.push();
-      p.translate(0, winHeight/2);
-      p.background(getFlatColor('clouds'));
+      p.translate(winWidth/2, winHeight/2);
+      p.background(getFlatColor('wetasphalt'));
 
       fft = new p5.FFT();
       analyzer = new p5.Amplitude();
 
       initSong();
+
+      clearList();
     };
 
     p.draw = function() {
-      p.background(getFlatColor('clouds'));
-      var spectrum = fft.analyze();
-      var amplitude = analyzer.getLevel();
-      setts.update();
-      spectrum = spectrum.slice(setts.sliceStart, setts.sliceEnd);
-      var average = getSpectrumAverage(spectrum);
-      var pIndex = p.map(average, 0, setts.sliceSize, 0, setts.nbrOfPoints);
-      pIndex = Math.floor(pIndex);
-      decreasePoints();
-      points[pIndex] = amplitude;
-      displayPoints();
-    }
-
-    function clearPoints() {
-      points = [];
-      for (var i = 0; i < setts.nbrOfPoints; i++) {
-        points.push(0);
-      }
-    }
-
-    function decreasePoints() {
-      for (var i = 0; i < setts.nbrOfPoints; i++) {
-        if (points[i] > 0.001) {
-          points[i] = points[i] * setts.decreaseSpeed;
-        } else {
-          points[i] = 0;
-        }
-      }
-    }
-
-    function displayPoints() {
-      var pointsLength = setts.nbrOfPoints;
-      var elemWidth = winWidth / pointsLength;
-
-      for (var i = 0; i < pointsLength; i++) {
-        var height = p.map(points[i], 0, 1, 0, winHeight) * setts.amplifier;
-        var color = p.color( p.map(i, 0, pointsLength, 0, 255) ,0 ,p.map(i, 0, pointsLength, 255, 0) );
-        p.noStroke();
-        p.fill(color)
-        p.rect(elemWidth*i, -height/2, elemWidth, height);
+      slow = slow + (setts.speed / 100);
+      if (slow >= 1) {
+        slow = slow % 1;
+        p.background(getFlatColor('midnightblue'));
+        var spectrum = fft.analyze();
+        spectrum = spectrum.slice(100, 800);
+        var amplitude = analyzer.getLevel();
+        addPoint(amplitude, spectrum);
+        setts.update();
+        drawSpiral();
       }
     }
 
@@ -105,7 +100,7 @@ $(function () {
       fft.setInput(song);
       analyzer.setInput(song);
 
-      clearPoints();
+      clearList();
     }
 
     function playPause() {
@@ -118,14 +113,95 @@ $(function () {
       }
     }
 
-    function getSpectrumAverage(spectrum) {
-      var sum = 0;
-      var coefs = 0;
-      for (var i = 0; i < spectrum.length; i++) {
-        sum += i * spectrum[i];
-        coefs += spectrum[i];
+    function clearList() {
+      points = [];
+      for (var i = 0; i < setts.maxPoints; i++) {
+        points.push({
+          size: 0,
+          color: 'rgba(0, 0, 0, 0)'
+        });
       }
-      return sum/coefs;
+    }
+
+    function drawSpiral() {
+      // Find final rotate angle
+      p.push();
+        if (setts.rotation) {
+          if (setts.rotationInvert) {
+            globalRotate -= (setts.rotationSpeed / 2000);
+          } else {
+            globalRotate += (setts.rotationSpeed / 2000);
+          }
+          p.rotate(globalRotate);
+        }
+        angle = 0;
+        for (var i = 0; i < points.length; i++) {
+          var nbrOrTurn = angle/(2*p.PI);
+          var distance = setts.initDistance + (nbrOrTurn * setts.maxPointSizeWithPaddingX);
+          var circonference = (distance*2) * p.PI;
+          var nbrOfCircle = circonference / setts.maxPointSizeWithPaddingY;
+          var incrementAngle = (2*p.PI) / nbrOfCircle;
+          angle = angle + incrementAngle;
+
+          var x = p.sin(angle)*distance;
+          var y = p.cos(angle)*distance;
+          displayPoints(points[i], x, y);
+        }
+      p.pop();
+    }
+
+    function displayPoints(data, x, y) {
+      if (data === null) {
+        return;
+      }
+      if (data.size > setts.pointStrokeLimit ) {
+        p.noFill();
+        p.stroke(data.color);
+        var strokeWeight = setts.minStrokeSize + (data.size * (setts.maxStrokeSize - setts.minStrokeSize));
+        strokeWeight = strokeWeight * setts.amplifier;
+        p.strokeWeight(strokeWeight);
+      } else {
+        p.fill(data.color);
+        p.noStroke();
+      }
+      var size = p.map(data.size, 0, 1, setts.minPointSize, setts.maxPointSize);
+      size = size * setts.amplifier;
+      p.ellipse(x,y, size, size);
+    }
+
+    function getMaxFreqGroup(data, nbrOfGroups) {
+      var groupedFreq = groupFreq(data, nbrOfGroups);
+      return groupedFreq.indexOf(_.max(groupedFreq));
+    }
+
+    function groupFreq(data, nbrOfGroups) {
+      var result = [];
+      var size = p.floor(data.length / nbrOfGroups);
+      for (var i = 0; i < (data.length - size ) ; i += size) {
+        var start = i;
+        var end = start + size;
+        var sum = 0;
+        for (var j = start; j < end; j++) {
+          sum += data[j];
+        }
+        result.push(p.floor(sum/size));
+      }
+      return result;
+    }
+
+    function addPoint(amplitude, spectrum) {
+      var maxFreqGroup = getMaxFreqGroup(spectrum, 100);
+      var colors = getFlatColorArray(['turquoise','emerland', 'peterriver', 'amethyst', 'greensea', 'nephritis', 'belizehole', 'wisteria', 'sunflower', 'carrot', 'alizarin', 'clouds', 'concrete', 'orange', 'pumpkin', 'pomegranate', 'silver', 'asbestos']);
+      var colorIndex = p.floor(maxFreqGroup % colors.length);
+      var color = colors[colorIndex];
+      var size = amplitude;
+      points.push({
+        size: size,
+        color: color
+      });
+      if (points.length > setts.maxPoints) {
+        points = points.slice(-setts.maxPoints);
+      }
     }
 
     function getFlatColor(name) {
