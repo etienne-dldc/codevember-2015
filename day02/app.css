@@ -13,7 +13,7 @@ html, body{
   top: 0;
   left: 0;
   color: rgb(230, 230, 230);
-  font-family: 'Open Sans';
+  font-family: 'Open Sans', Tahoma, sans-serif;
   font-weight: 300;
   padding: 0.5em;
 }
