@@ -5,3 +5,33 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,c
 html, body{
   overflow: hidden;
 }
+
+.infos{
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  color: rgb(24, 24, 24);
+  font-family: 'Open Sans';
+  font-weight: 300;
+  padding: 0.5em;
+}
+
+.infos h1{
+  font-size: 1.8em;
+}
+
+.infos p{
+  padding-top: .5em;
+  font-size: 1.1em;
+  padding-left: .1em;
+}
+
+.infos p.made-by{
+  font-size: 0.9em;
+}
+
+.infos p.instructions{
+  padding-top: 1em;
+  line-height: 1.3em;
+}

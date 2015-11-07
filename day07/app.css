@@ -26,3 +26,11 @@ html, body{
   font-size: 1.1em;
   padding-left: .1em;
 }
+
+.infos p.made-by{
+  font-size: 0.9em;
+}
+
+.infos p.instructions{
+  padding-top: 1em;
+}
