@@ -19,7 +19,7 @@ $(function () {
       this.cubeCenterZ = 200;
       this.cubeRedCenterZ = 200;
       this.cubeSize = 100;
-      this.tournAround = true;
+      this.turnAround = true;
     };
 
     p.setup = function setup() {
@@ -29,7 +29,7 @@ $(function () {
       gui.add(setts, 'cubeRedCenterZ', -300, 1000);
       gui.add(setts, 'cubeCenterZ', -300, 1000);
       gui.add(setts, 'cubeSize', 50, 500);
-      gui.add(setts, 'tournAround');
+      gui.add(setts, 'turnAround');
 
       p.createCanvas(winWidth, winHeight);
       p.push();
@@ -72,7 +72,7 @@ $(function () {
         orientationX = p.map(p.mouseY, 0, winHeight, p.PI/3, -p.PI/3);
         orientationY = p.map(p.mouseX, 0, winWidth, -p.PI/3, p.PI/3);
       }
-      if (setts.tournAround) {
+      if (setts.turnAround) {
         rotationX = orientationX;
         rotationY = orientationY;
       } else {
