@@ -24,7 +24,7 @@ $(function () {
   $(gui.domElement).parent().css('z-index', '1000');
   var ctrl1 = gui.add(setts, 'take', 1, 10);
   ctrl1.onChange(update);
-  var ctrl2 = gui.add(setts, 'range', 10, 100);
+  var ctrl2 = gui.add(setts, 'range', 1, 100);
   ctrl2.onChange(update);
   var ctrl3 = gui.add(setts, 'zoom', 1, 20000);
   ctrl3.onChange(update);
@@ -65,7 +65,7 @@ $(function () {
       }
     }
     generateWhichWin();
-    $resume.html('If you chose <b>' + setts.take + '</b> numbers over <b>' + setts.range + '</b> possiblities...' );
+    $resume.html('If you choose <b>' + setts.take + '</b> numbers over <b>' + setts.range + '</b> possiblities...' );
 
     if (selection > proba.length-1) {
       selection = proba.length-1;
@@ -91,7 +91,7 @@ $(function () {
       if (i === setts.take) {
         $elem.html('Jackpot ! (' + i + ' numbers)');
       } else {
-        $elem.html(i + ' numbers');
+        $elem.html(i + ' number' + (i == 1 ? '' : 's'));
       }
       $elem.data('selection', i);
       $elem.click(function(event) {
@@ -123,7 +123,7 @@ $(function () {
       var atLeastExactly = 'at least';
     }
     var winCombinations = proba[selection] * totalPossibleCombinations;
-    var text = '... you have ' + chance + ' to get ' + atLeastExactly + ' <b>' + selection + ' correct</b> numbers.';
+    var text = '... you have ' + chance + ' to get ' + atLeastExactly + ' ' + pluraliseNumber(selection);
     text += '</br>That represent <b>' + formatNumber(winCombinations) + '</b> combinations over the <b>' + formatNumber(totalPossibleCombinations) + '</b> possible combinations.';
     $yourProba.html(text);
   }
@@ -136,13 +136,13 @@ $(function () {
     }
     if (setts.zoomTotal === 1) {
       var text = 'The area of this page represent the <b>' + formatNumber(totalPossibleCombinations) + '</b> possible combinations.';
-      text += '</br>The red rectangle is your probability to get ' + atLeastExactly + ' <b>' + selection + ' correct</b> numbers.';
+      text += '</br>The red rectangle is your probability to get ' + atLeastExactly + ' ' + pluraliseNumber(selection);
     } else {
       var multiply = (1 / Math.pow(setts.zoomTotal, 2));
       var percentage = multiply * 100;
       var combination = (1/proba[proba.length-1]) * multiply;
       var text = 'The area of this page represent <b>' + formatNumber(combination) + '</b> combinations </br> It\'s <b>' + formatNumber(percentage) + ' %</b> of the <b>' + formatNumber(totalPossibleCombinations) + '</b> possible combinations.';
-      text += '</br>The red rectangle is your probability to get ' + atLeastExactly + ' <b>' + selection + ' correct</b> numbers.';
+      text += '</br>The red rectangle is your probability to get ' + atLeastExactly + ' ' + pluraliseNumber(selection);
     }
     $representation.html(text);
   }
@@ -199,6 +199,16 @@ $(function () {
     }
 
     return resultInterger.join('') + resultFloat;
+  }
+
+  function pluraliseNumber(number) {
+    var result = '';
+    if (number <= 1) {
+      result =  'number';
+    } else {
+      result =  'numbers';
+    }
+    return '<b>' + number + ' correct</b> ' + result + '.'
   }
 
   generateWhichWin();
