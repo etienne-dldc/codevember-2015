@@ -6,40 +6,6 @@ html, body{
   overflow: hidden;
 }
 
-canvas{
-  position: absolute;
-}
-
-.lose{
-  position: fixed;
-  z-index: 20;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 5em;
-  transform: translateY(-50%);
-  text-align: center;
-  font-family: 'Open Sans', Tahoma, sans-serif;
-  line-height: 1.3;
-  font-size: 2em;
-  font-weight: 300;
-  background: black;
-  color: white;
-  display: none;
-  box-shadow: 0 0 70px rgba(255, 255, 255, 0.2);
-}
-.lose p{
-  margin-top: 1em;
-}
-
-.dat-gui-container{
-  z-index: 100;
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 0;
-}
 
 .infos{
   position: fixed;
