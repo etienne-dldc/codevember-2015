@@ -4,8 +4,78 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,c
 
 html, body{
   overflow: hidden;
+  background: rgb(63, 63, 83);
 }
 
+.content{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 200px;
+  text-align: center;
+  z-index: 10;
+  color: white;
+  font-family: 'Open Sans', Tahoma, sans-serif;
+  line-height: 1.5;
+  font-size: 1.6em;
+  font-weight: 300;
+  opacity: 0.5;
+
+  transition-duration: 0.3s;
+}
+
+.content:hover{
+  opacity: 1;
+}
+
+.content .which-win{
+  padding: 1em;
+  font-size: 0.8em;
+}
+
+.content b{
+  font-weight: 800;
+}
+
+.content .which-win-elem{
+  cursor: pointer;
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  background: rgba(255, 255, 255, 0.2);
+  margin-right: 0.5em;
+  margin-bottom: .5em;
+  border: 2px solid transparent;
+}
+
+.content .which-win-elem.selected{
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+}
+
+.proba-represent{
+  background: rgb(135, 78, 85);
+  transition-duration: .3s;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+
+  transition-duration: .2s;
+}
+
+.representation{
+  margin-top: .5em;
+}
+
+.screen-size{
+  position: fixed;
+  bottom: 10px;
+  border-bottom: 3px solid white;
+  right: 0;
+  left: 0;
+  z-index: 11;
+}
 
 .infos{
   position: fixed;
@@ -20,10 +90,6 @@ html, body{
   padding-bottom: 1em;
 
   transition-duration: .3s;
-}
-
-.infos:hover{
-  background: rgb(0, 0, 0);
 }
 
 .infos a{
