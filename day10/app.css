@@ -1,0 +1,150 @@
+.clock {
+  border-radius: 50%;
+  height: 30em;
+  position: relative;
+  width: 30em;
+  display: block;
+  margin: auto;
+  overflow: hidden;
+  margin-top: 5%;
+}
+
+.clock.simple:after {
+  background: #000;
+  border-radius: 50%;
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 5%;
+  height: 5%;
+  z-index: 10;
+}
+
+.minutes-container, .hours-container, .seconds-container, .marks {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.marks > .minute-mark{
+  height: 50%;
+  left: 49.75%;
+  position: absolute;
+  top: 50%;
+  transform-origin: 50% 0%;
+  width: 0.5%;
+}
+
+.marks > .minute-mark .mark{
+  background: #000;
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  top: 92%;
+}
+
+.marks > .hour-mark{
+  height: 50%;
+  left: 49%;
+  position: absolute;
+  top: 50%;
+  transform-origin: 50% 0%;
+  width: 2%;
+}
+
+.marks > .hour-mark .mark{
+  background: #000;
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  top: 84%;
+}
+
+.hours, .minutes, .seconds{
+  -webkit-transition-duration: .1s;
+  -o-transition-duration: .1s;
+  transition-duration: .1s;
+}
+
+.hours {
+  background: #000;
+  height: 20%;
+  left: 48.75%;
+  position: absolute;
+  top: 30%;
+  transform-origin: 50% 100%;
+  width: 2.5%;
+}
+
+.minutes {
+  background: #000;
+  height: 40%;
+  left: 49%;
+  position: absolute;
+  top: 10%;
+  transform-origin: 50% 100%;
+  width: 2%;
+}
+
+.seconds {
+  background: #000;
+  height: 45%;
+  left: 49.5%;
+  position: absolute;
+  top: 14%;
+  transform-origin: 50% 80%;
+  width: 1%;
+  z-index: 8;
+}
+
+
+
+h2.text{
+  font-family: "Open Sans", Tahoma, sans-serif;
+  text-align: center;
+  font-size: 5em;
+  margin-top: 0.5em;
+  font-weight: 100;
+}
+
+
+
+
+.infos{
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  color: rgb(29, 29, 29);
+  font-family: 'Open Sans', Tahoma, sans-serif;
+  font-weight: 300;
+  padding: 0.5em;
+  padding-right: 2em;
+  padding-bottom: 1em;
+
+  -webkit-transition-duration: .3s;
+
+          transition-duration: .3s;
+}
+
+.infos h1{
+  font-size: 1.8em;
+}
+
+.infos p{
+  padding-top: .5em;
+  font-size: 1.1em;
+  padding-left: .1em;
+}
+
+.infos p.made-by{
+  font-size: 0.9em;
+}
+
+.infos p.instructions{
+  padding-top: 1em;
+}

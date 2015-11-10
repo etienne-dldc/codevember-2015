@@ -8,16 +8,16 @@ $(function () {
   var Settings = function() {
     this.take = 6;
     this.range = 49;
-    this.zoom = 1;
+    this.hardZoom = 1;
     this.exactly = false;
-    this.zoomPrecision1 = 0;
-    this.zoomPrecision2 = 0;
-    this.zoomPrecision3 = 0;
+    this.normalZoom = 0;
+    this.middleZomm = 0;
+    this.softZoom = 0;
   };
   Settings.prototype.update = function () {
     this.take = Math.floor(this.take);
     this.range = Math.floor(this.range);
-    this.zoomTotal = this.zoom + this.zoomPrecision1 + this.zoomPrecision2 + this.zoomPrecision3;
+    this.zoomTotal = this.hardZoom + this.normalZoom + this.middleZomm + this.softZoom;
   };
   var setts = new Settings();
   var gui = new dat.GUI();
@@ -26,14 +26,14 @@ $(function () {
   ctrl1.onChange(update);
   var ctrl2 = gui.add(setts, 'range', 1, 100);
   ctrl2.onChange(update);
-  var ctrl3 = gui.add(setts, 'zoom', 1, 20000);
-  ctrl3.onChange(update);
-  var ctrl4 = gui.add(setts, 'zoomPrecision1', 0, 1000);
-  ctrl4.onChange(update);
-  var ctrl5 = gui.add(setts, 'zoomPrecision2', 0, 100);
-  ctrl5.onChange(update);
-  var ctrl6 = gui.add(setts, 'zoomPrecision3', 0, 10);
+  var ctrl6 = gui.add(setts, 'softZoom', 0, 10);
   ctrl6.onChange(update);
+  var ctrl4 = gui.add(setts, 'middleZomm', 0, 100);
+  ctrl4.onChange(update);
+  var ctrl5 = gui.add(setts, 'normalZoom', 0, 1000);
+  ctrl5.onChange(update);
+  var ctrl3 = gui.add(setts, 'hardZoom', 1, 20000);
+  ctrl3.onChange(update);
   var ctrl7 = gui.add(setts, 'exactly');
   ctrl7.onChange(update);
 
