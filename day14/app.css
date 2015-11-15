@@ -4,75 +4,28 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,c
 
 
 html, body{
-	background: #1A7BAE;
-}
-
-
-.infos{
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  left: 0;
-  color: rgb(250, 250, 250);
+	background: rgb(0, 0, 0);
+  color: white;
   font-family: 'Open Sans', Tahoma, sans-serif;
-  font-weight: 300;
-  padding: 0.5em;
-  padding-right: 2em;
-  padding-bottom: 1em;
-
-  transition-duration: .3s;
-}
-
-.infos a{
-  color: rgb(230, 230, 230);
-}
-
-.infos h1{
-  font-size: 1.8em;
-}
-
-.infos p{
-  padding-top: .5em;
-  font-size: 1.1em;
-  padding-left: .1em;
-}
-
-.infos p.made-by{
-  font-size: 0.9em;
-}
-
-.infos p.instructions{
-  padding-top: 1em;
 }
 
 
-svg {
-  font: 10px sans-serif;
-	margin-top: 100px;
+.main{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
 }
 
-.line {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 4px;
+.main h1{
+  font-weight: 100;
+  font-size: 4em;
 }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-path {
-	fill: none;
-	stroke: #fff;
-	stroke-linecap: round;
-	stroke-linejoin: round;
-}
-
-.points circle{
-	fill: none;
-	stroke: #fff;
-	stroke-width: 1px;
+.main p{
+  font-weight: 100;
+  margin-top: 2em;
 }
