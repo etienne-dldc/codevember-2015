@@ -2,4 +2,4 @@
 
 > This is my repo for the [http://codevember2015.tumblr.com/](**codevember**) challenge  
 > One codepen each day of November  
-> [http://codepen.io/collection/DRzvdk](See my collection in codepen)
+> [See my collection in codepen](http://codepen.io/collection/DRzvdk)
